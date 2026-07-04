@@ -42,12 +42,9 @@ function RootComponent() {
         <SidebarProvider className="flex flex-col min-h-svh">
           <RightSidebarContext.Provider value={{ setRightSidebarContent }}>
             <Header />
-            <div className="flex flex-1">
+            <div className="flex flex-1 min-h-0">
               <Outlet />
-              <RightSidebar
-                content={rightSidebarContent}
-                onClose={() => setRightSidebarContent(null)}
-              />
+              <RightSidebar content={rightSidebarContent} />
             </div>
           </RightSidebarContext.Provider>
         </SidebarProvider>

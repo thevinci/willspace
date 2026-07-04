@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between p-4">
+    <header className="flex items-center justify-between p-4 border-b">
       <h1>willspace</h1>
 
       <nav className="space-x-4">

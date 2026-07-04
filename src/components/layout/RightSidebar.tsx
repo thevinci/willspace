@@ -1,35 +1,26 @@
-import { Sidebar, SidebarContent, useSidebar } from "@/components/ui/sidebar";
-import { useEffect } from "react";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 
 export function RightSidebar({
   content,
-  onClose,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  content: React.ReactNode;
-  onClose: () => void;
+  content: React.ReactNode | null;
 }) {
-  const { setOpen } = useSidebar();
   const isOpen = !!content;
 
-  useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen, setOpen]);
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <Sidebar
       {...props}
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          onClose();
-        }
-      }}
+      collapsible="none"
       side="right"
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]! max-w-[100vw]"
+      className="h-full max-w-[100vw] border-l"
       style={{ "--sidebar-width": "500px" } as React.CSSProperties}
     >
-      <SidebarContent className="p-0">{content}</SidebarContent>
+      <SidebarContent className="h-full p-0">{content}</SidebarContent>
     </Sidebar>
   );
 }
