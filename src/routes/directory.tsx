@@ -5,11 +5,7 @@ import { useSpacetimeDB, useSpacetimeDBQuery } from "spacetimedb/tanstack";
 import { tables } from "@/module_bindings";
 import { useSetRightSidebar } from "@/context/right-sidebar-context";
 import { CategoryCreateSideContent } from "@/components/pages/directory/CategoryCreateSideContent";
-import {
-  DIRECTORY_CATEGORIES,
-  SAMPLE_PLACES,
-  SAMPLE_WEBSITES,
-} from "@/data/directory";
+import { SAMPLE_PLACES, SAMPLE_WEBSITES } from "@/data/directory";
 import { FilterLeftBar } from "@/components/pages/directory/FilterLeftBar";
 import { PersonCreateSideContent } from "@/components/pages/directory/PersonCreateSideContent";
 import { PlaceCreateSideContent } from "@/components/pages/directory/PlaceCreateSideContent";
@@ -111,7 +107,6 @@ function RouteComponent() {
   return (
     <div className="flex flex-1 min-h-0">
       <FilterLeftBar
-        categories={DIRECTORY_CATEGORIES}
         selectedCategoryKey={selectedCategoryKey}
         onSelectCategory={setSelectedCategoryKey}
         onCreateCategory={() =>

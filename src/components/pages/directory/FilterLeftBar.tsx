@@ -1,23 +1,39 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { useSpacetimeDBQuery } from "spacetimedb/tanstack";
+import { tables } from "@/module_bindings";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { DirectoryCategory } from "@/data/directory";
+
+type DirectoryCategory = {
+  key: string;
+  name: string;
+  level: number;
+};
 
 export function FilterLeftBar({
-  categories,
   selectedCategoryKey,
   onSelectCategory,
   onCreateCategory,
 }: {
-  categories: DirectoryCategory[];
   selectedCategoryKey: string | null;
   onSelectCategory: (key: string | null) => void;
   onCreateCategory: () => void;
 }) {
+  const [categoryRows] = useSpacetimeDBQuery(tables.directoryCategory);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(
     new Set(["people", "places", "websites"]),
   );
+
+  const categories = useMemo<DirectoryCategory[]>(() => {
+    return categoryRows
+      .map((row) => ({
+        key: row.key,
+        name: row.name,
+        level: row.level,
+      }))
+      .sort((a, b) => a.key.localeCompare(b.key));
+  }, [categoryRows]);
 
   const hasChildren = (key: string) =>
     categories.some((cat) => cat.key.startsWith(`${key}/`));
@@ -55,6 +71,11 @@ export function FilterLeftBar({
       </div>
 
       <ul className="space-y-1">
+        {categories.length === 0 ? (
+          <li className="px-2 py-1.5 text-sm text-muted-foreground">
+            No categories found
+          </li>
+        ) : null}
         {categories.filter(isVisible).map((category) => {
           const open = expandedKeys.has(category.key);
           const hasKids = hasChildren(category.key);
@@ -70,7 +91,9 @@ export function FilterLeftBar({
                     ? "bg-accent text-accent-foreground"
                     : "hover:bg-accent/60",
                 )}
-                style={{ paddingLeft: `${category.level * 0.9 + 0.5}rem` }}
+                style={{
+                  paddingLeft: `${(category.level - 1) * 0.9 + 0.5}rem`,
+                }}
                 onClick={() => {
                   if (hasKids) {
                     setExpandedKeys((prev) => {

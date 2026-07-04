@@ -11,5 +11,14 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
+  id: __t.u64().primaryKey(),
   name: __t.string(),
+  categoryKey: __t.string().name("category_key"),
+  categories: __t.array(__t.string()),
+  description: __t.string(),
+  url: __t.string(),
+  profileImage: __t.string().name("profile_image"),
+  dataJson: __t.string().name("data_json"),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
 });

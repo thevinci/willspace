@@ -11,5 +11,12 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
+  id: __t.u64().primaryKey(),
+  key: __t.string(),
   name: __t.string(),
+  count: __t.f64(),
+  description: __t.string(),
+  level: __t.f64(),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
 });

@@ -8,9 +8,80 @@ import {
   t as __t,
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
-} from 'spacetimedb';
+} from "spacetimedb";
 
-export const Person = __t.object('Person', {
+export const DirectoryCategory = __t.object("DirectoryCategory", {
+  id: __t.u64(),
+  key: __t.string(),
+  name: __t.string(),
+  count: __t.f64(),
+  description: __t.string(),
+  level: __t.f64(),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
+});
+export type DirectoryCategory = __Infer<typeof DirectoryCategory>;
+
+export const DirectoryPerson = __t.object("DirectoryPerson", {
+  id: __t.u64(),
+  firstName: __t.string(),
+  lastName: __t.string(),
+  company: __t.string(),
+  title: __t.string(),
+  bio: __t.string(),
+  categoryKey: __t.string(),
+  categories: __t.array(__t.string()),
+  email: __t.string(),
+  phone: __t.string(),
+  city: __t.string(),
+  state: __t.string(),
+  zip: __t.string(),
+  country: __t.string(),
+  website: __t.string(),
+  profileImage: __t.string(),
+  dataJson: __t.string(),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
+});
+export type DirectoryPerson = __Infer<typeof DirectoryPerson>;
+
+export const DirectoryPlace = __t.object("DirectoryPlace", {
+  id: __t.u64(),
+  name: __t.string(),
+  categoryKey: __t.string(),
+  categories: __t.array(__t.string()),
+  description: __t.string(),
+  address: __t.string(),
+  city: __t.string(),
+  state: __t.string(),
+  zip: __t.string(),
+  country: __t.string(),
+  phone: __t.string(),
+  email: __t.string(),
+  website: __t.string(),
+  profileImage: __t.string(),
+  dataJson: __t.string(),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
+});
+export type DirectoryPlace = __Infer<typeof DirectoryPlace>;
+
+export const DirectoryWebsite = __t.object("DirectoryWebsite", {
+  id: __t.u64(),
+  name: __t.string(),
+  categoryKey: __t.string(),
+  categories: __t.array(__t.string()),
+  description: __t.string(),
+  url: __t.string(),
+  profileImage: __t.string(),
+  dataJson: __t.string(),
+  created: __t.timestamp(),
+  updated: __t.timestamp(),
+});
+export type DirectoryWebsite = __Infer<typeof DirectoryWebsite>;
+
+export const Person = __t.object("Person", {
   name: __t.string(),
 });
 export type Person = __Infer<typeof Person>;
+

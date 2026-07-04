@@ -10,6 +10,9 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.row({
+export default {
+  key: __t.string(),
   name: __t.string(),
-});
+  description: __t.string(),
+  level: __t.f64(),
+};

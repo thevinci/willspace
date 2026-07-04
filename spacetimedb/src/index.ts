@@ -1,3 +1,4 @@
+import { Timestamp } from "spacetimedb";
 import { schema, table, t } from "spacetimedb/server";
 
 const spacetimedb = schema({
@@ -100,6 +101,29 @@ export const add = spacetimedb.reducer(
   { name: t.string() },
   (ctx, { name }) => {
     ctx.db.person.insert({ name });
+  },
+);
+
+export const createDirectoryCategory = spacetimedb.reducer(
+  {
+    key: t.string(),
+    name: t.string(),
+    description: t.string(),
+    level: t.number(),
+  },
+  (ctx, { key, name, description, level }) => {
+    const now = Timestamp.now();
+
+    ctx.db.directoryCategory.insert({
+      id: 0n,
+      key,
+      name,
+      count: 0,
+      description,
+      level,
+      created: now,
+      updated: now,
+    });
   },
 );
 

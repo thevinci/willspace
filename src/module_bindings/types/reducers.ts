@@ -3,11 +3,14 @@
 
 /* eslint-disable */
 /* tslint:disable */
-import { type Infer as __Infer } from 'spacetimedb';
+import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
-import AddReducer from '../add_reducer';
-import SayHelloReducer from '../say_hello_reducer';
+import AddReducer from "../add_reducer";
+import CreateDirectoryCategoryReducer from "../create_directory_category_reducer";
+import SayHelloReducer from "../say_hello_reducer";
 
 export type AddParams = __Infer<typeof AddReducer>;
+export type CreateDirectoryCategoryParams = __Infer<typeof CreateDirectoryCategoryReducer>;
 export type SayHelloParams = __Infer<typeof SayHelloReducer>;
+
