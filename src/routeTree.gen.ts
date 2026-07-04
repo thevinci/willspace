@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpaceRouteImport } from './routes/space'
+import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SpaceRoute = SpaceRouteImport.update({
+  id: '/space',
+  path: '/space',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectoryRoute = DirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
   path: '/demo',
@@ -26,31 +38,53 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/directory': typeof DirectoryRoute
+  '/space': typeof SpaceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/directory': typeof DirectoryRoute
+  '/space': typeof SpaceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/directory': typeof DirectoryRoute
+  '/space': typeof SpaceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo'
+  fullPaths: '/' | '/demo' | '/directory' | '/space'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo'
-  id: '__root__' | '/' | '/demo'
+  to: '/' | '/demo' | '/directory' | '/space'
+  id: '__root__' | '/' | '/demo' | '/directory' | '/space'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoRoute: typeof DemoRoute
+  DirectoryRoute: typeof DirectoryRoute
+  SpaceRoute: typeof SpaceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/space': {
+      id: '/space'
+      path: '/space'
+      fullPath: '/space'
+      preLoaderRoute: typeof SpaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/directory': {
+      id: '/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof DirectoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo': {
       id: '/demo'
       path: '/demo'
@@ -71,6 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoRoute: DemoRoute,
+  DirectoryRoute: DirectoryRoute,
+  SpaceRoute: SpaceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
