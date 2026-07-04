@@ -48,17 +48,25 @@ export function Header() {
 
       <div className="flex items-center gap-2">
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon" aria-label="Select theme" />}>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" aria-label="Select theme" />
+            }
+          >
             <ThemeIcon theme={theme} />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-36">
             <DropdownMenuRadioGroup
               value={theme}
-              onValueChange={(value) => setTheme((value as ThemeOption) ?? "system")}
+              onValueChange={(value) =>
+                setTheme((value as ThemeOption) ?? "system")
+              }
             >
               <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="system">
+                System
+              </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
