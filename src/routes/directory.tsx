@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Building2, Briefcase, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSpacetimeDB, useSpacetimeDBQuery } from "spacetimedb/tanstack";
 import { tables } from "@/module_bindings";
@@ -10,7 +10,7 @@ import { FilterLeftBar } from "@/components/pages/directory/FilterLeftBar";
 import { PersonCreateSideContent } from "@/components/pages/directory/PersonCreateSideContent";
 import { PlaceCreateSideContent } from "@/components/pages/directory/PlaceCreateSideContent";
 import { WebsiteCreateSideContent } from "@/components/pages/directory/WebsiteCreateSideContent";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getStorageUrl } from "@/lib/convex-storage";
 
 type DirectoryPerson = {
   id: string;
@@ -35,6 +36,8 @@ type DirectoryPerson = {
   state?: string;
   country?: string;
   website?: string;
+  profileImage?: string;
+  profileImageUrl?: string | null;
 };
 
 export const Route = createFileRoute("/directory")({
@@ -44,7 +47,10 @@ export const Route = createFileRoute("/directory")({
 function RouteComponent() {
   const { setRightSidebarContent } = useSetRightSidebar();
   const { isActive } = useSpacetimeDB();
-  const [peopleRows] = useSpacetimeDBQuery(tables.person);
+  const [peopleRows] = useSpacetimeDBQuery(tables.directoryPerson);
+  const [imageUrlByStorageId, setImageUrlByStorageId] = useState<
+    Record<string, string | null>
+  >({});
 
   const [selectedCategoryKey, setSelectedCategoryKey] = useState<string | null>(
     "people",
@@ -53,18 +59,70 @@ function RouteComponent() {
   const [peopleSortBy, setPeopleSortBy] = useState("name-asc");
 
   const people = useMemo<DirectoryPerson[]>(() => {
-    return peopleRows.map((row, index) => {
-      const parts = row.name.trim().split(/\s+/).filter(Boolean);
-      const firstName = parts[0] ?? "Unknown";
-      const lastName = parts.slice(1).join(" ");
-
+    return peopleRows.map((row) => {
       return {
-        id: `person-${index}-${row.name}`,
-        firstName,
-        lastName,
+        id: row.id.toString(),
+        firstName: row.firstName,
+        lastName: row.lastName,
+        company: row.company || undefined,
+        title: row.title || undefined,
+        email: row.email || undefined,
+        phone: row.phone || undefined,
+        city: row.city || undefined,
+        state: row.state || undefined,
+        country: row.country || undefined,
+        website: row.website || undefined,
+        profileImage: row.profileImage || undefined,
+        profileImageUrl: row.profileImage
+          ? imageUrlByStorageId[row.profileImage]
+          : null,
       };
     });
-  }, [peopleRows]);
+  }, [peopleRows, imageUrlByStorageId]);
+
+  useEffect(() => {
+    const storageIds = Array.from(
+      new Set(
+        peopleRows
+          .map((row) => row.profileImage?.trim())
+          .filter((value): value is string => !!value),
+      ),
+    ).filter((storageId) => !(storageId in imageUrlByStorageId));
+
+    if (storageIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadUrls = async () => {
+      const entries = await Promise.all(
+        storageIds.map(async (storageId) => {
+          try {
+            const url = await getStorageUrl(storageId);
+            return [storageId, url] as const;
+          } catch {
+            return [storageId, null] as const;
+          }
+        }),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      setImageUrlByStorageId((prev) => ({
+        ...prev,
+        ...Object.fromEntries(entries),
+      }));
+    };
+
+    void loadUrls();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [peopleRows, imageUrlByStorageId]);
 
   const filteredPeople = useMemo(() => {
     const query = peopleSearchQuery.trim().toLowerCase();
@@ -187,6 +245,12 @@ function RouteComponent() {
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-14 w-14">
+                          {person.profileImageUrl && (
+                            <AvatarImage
+                              src={person.profileImageUrl}
+                              alt={`${person.firstName} ${person.lastName}`}
+                            />
+                          )}
                           <AvatarFallback>
                             {(person.firstName[0] ?? "U").toUpperCase()}
                             {(person.lastName[0] ?? "").toUpperCase()}
@@ -276,7 +340,7 @@ function RouteComponent() {
               <Card>
                 <CardContent className="p-6 text-sm text-muted-foreground">
                   {people.length === 0
-                    ? "No people records yet. Add a person in /space to see cards here."
+                    ? "No people records yet. Add a person to get started."
                     : "No people match your search."}
                 </CardContent>
               </Card>

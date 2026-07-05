@@ -10,14 +10,13 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.row({
-  id: __t.u64().primaryKey(),
-  firstName: __t.string().name("first_name"),
-  lastName: __t.string().name("last_name"),
+export default {
+  firstName: __t.string(),
+  lastName: __t.string(),
   company: __t.string(),
   title: __t.string(),
   bio: __t.string(),
-  categoryKey: __t.string().name("category_key"),
+  categoryKey: __t.string(),
   categories: __t.array(__t.string()),
   email: __t.option(__t.string()),
   phone: __t.option(__t.string()),
@@ -26,8 +25,6 @@ export default __t.row({
   zip: __t.string(),
   country: __t.string(),
   website: __t.string(),
-  profileImage: __t.string().name("profile_image"),
-  dataJson: __t.string().name("data_json"),
-  created: __t.timestamp(),
-  updated: __t.timestamp(),
-});
+  profileImage: __t.string(),
+  dataJson: __t.string(),
+};

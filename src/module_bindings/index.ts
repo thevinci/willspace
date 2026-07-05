@@ -35,7 +35,9 @@ import {
 
 // Import all reducer arg schemas
 import AddReducer from "./add_reducer";
+import ClearDirectoryPeopleReducer from "./clear_directory_people_reducer";
 import CreateDirectoryCategoryReducer from "./create_directory_category_reducer";
+import CreateDirectoryPersonReducer from "./create_directory_person_reducer";
 import SayHelloReducer from "./say_hello_reducer";
 
 // Import all procedure arg schemas
@@ -69,20 +71,12 @@ const tablesSchema = __schema({
   directoryPerson: __table({
     name: 'directory_person',
     indexes: [
-      { accessor: 'email', name: 'directory_person_email_idx_btree', algorithm: 'btree', columns: [
-        'email',
-      ] },
       { accessor: 'id', name: 'directory_person_id_idx_btree', algorithm: 'btree', columns: [
         'id',
       ] },
-      { accessor: 'phone', name: 'directory_person_phone_idx_btree', algorithm: 'btree', columns: [
-        'phone',
-      ] },
     ],
     constraints: [
-      { name: 'directory_person_email_key', constraint: 'unique', columns: ['email'] },
       { name: 'directory_person_id_key', constraint: 'unique', columns: ['id'] },
-      { name: 'directory_person_phone_key', constraint: 'unique', columns: ['phone'] },
     ],
   }, DirectoryPersonRow),
   directoryPlace: __table({
@@ -119,7 +113,9 @@ const tablesSchema = __schema({
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("add", AddReducer),
+  __reducerSchema("clear_directory_people", ClearDirectoryPeopleReducer),
   __reducerSchema("create_directory_category", CreateDirectoryCategoryReducer),
+  __reducerSchema("create_directory_person", CreateDirectoryPersonReducer),
   __reducerSchema("say_hello", SayHelloReducer),
 );
 

@@ -21,19 +21,19 @@ const spacetimedb = schema({
       id: t.u64().primaryKey().autoInc(),
       firstName: t.string(),
       lastName: t.string(),
-      company: t.string(),
-      title: t.string(),
-      bio: t.string(),
-      categoryKey: t.string(),
+      company: t.string().optional(),
+      title: t.string().optional(),
+      bio: t.string().optional(),
+      categoryKey: t.string().optional(),
       categories: t.array(t.string()),
-      email: t.string().unique(),
-      phone: t.string().unique(),
-      city: t.string(),
-      state: t.string(),
-      zip: t.string(),
-      country: t.string(),
-      website: t.string(),
-      profileImage: t.string(),
+      email: t.string().optional(),
+      phone: t.string().optional(),
+      city: t.string().optional(),
+      state: t.string().optional(),
+      zip: t.string().optional(),
+      country: t.string().optional(),
+      website: t.string().optional(),
+      profileImage: t.string().optional(),
       dataJson: t.string(),
       created: t.timestamp(),
       updated: t.timestamp(),
@@ -126,6 +126,58 @@ export const createDirectoryCategory = spacetimedb.reducer(
     });
   },
 );
+
+export const createDirectoryPerson = spacetimedb.reducer(
+  {
+    firstName: t.string(),
+    lastName: t.string(),
+    company: t.string(),
+    title: t.string(),
+    bio: t.string(),
+    categoryKey: t.string(),
+    categories: t.array(t.string()),
+    email: t.string().optional(),
+    phone: t.string().optional(),
+    city: t.string(),
+    state: t.string(),
+    zip: t.string(),
+    country: t.string(),
+    website: t.string(),
+    profileImage: t.string(),
+    dataJson: t.string(),
+  },
+  (ctx, args) => {
+    const now = Timestamp.now();
+
+    ctx.db.directoryPerson.insert({
+      id: 0n,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      company: args.company,
+      title: args.title,
+      bio: args.bio,
+      categoryKey: args.categoryKey,
+      categories: args.categories,
+      email: args.email,
+      phone: args.phone,
+      city: args.city,
+      state: args.state,
+      zip: args.zip,
+      country: args.country,
+      website: args.website,
+      profileImage: args.profileImage,
+      dataJson: args.dataJson,
+      created: now,
+      updated: now,
+    });
+  },
+);
+
+export const clearDirectoryPeople = spacetimedb.reducer((ctx) => {
+  for (const row of ctx.db.directoryPerson.iter()) {
+    ctx.db.directoryPerson.delete(row);
+  }
+});
 
 export const sayHello = spacetimedb.reducer((ctx) => {
   for (const person of ctx.db.person.iter()) {
