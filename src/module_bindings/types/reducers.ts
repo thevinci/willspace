@@ -10,11 +10,13 @@ import AddReducer from "../add_reducer";
 import ClearDirectoryPeopleReducer from "../clear_directory_people_reducer";
 import CreateDirectoryCategoryReducer from "../create_directory_category_reducer";
 import CreateDirectoryPersonReducer from "../create_directory_person_reducer";
+import CreateDirectoryPlaceReducer from "../create_directory_place_reducer";
 import SayHelloReducer from "../say_hello_reducer";
 
 export type AddParams = __Infer<typeof AddReducer>;
 export type ClearDirectoryPeopleParams = __Infer<typeof ClearDirectoryPeopleReducer>;
 export type CreateDirectoryCategoryParams = __Infer<typeof CreateDirectoryCategoryReducer>;
 export type CreateDirectoryPersonParams = __Infer<typeof CreateDirectoryPersonReducer>;
+export type CreateDirectoryPlaceParams = __Infer<typeof CreateDirectoryPlaceReducer>;
 export type SayHelloParams = __Infer<typeof SayHelloReducer>;
 

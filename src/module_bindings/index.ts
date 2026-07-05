@@ -38,6 +38,7 @@ import AddReducer from "./add_reducer";
 import ClearDirectoryPeopleReducer from "./clear_directory_people_reducer";
 import CreateDirectoryCategoryReducer from "./create_directory_category_reducer";
 import CreateDirectoryPersonReducer from "./create_directory_person_reducer";
+import CreateDirectoryPlaceReducer from "./create_directory_place_reducer";
 import SayHelloReducer from "./say_hello_reducer";
 
 // Import all procedure arg schemas
@@ -116,6 +117,7 @@ const reducersSchema = __reducers(
   __reducerSchema("clear_directory_people", ClearDirectoryPeopleReducer),
   __reducerSchema("create_directory_category", CreateDirectoryCategoryReducer),
   __reducerSchema("create_directory_person", CreateDirectoryPersonReducer),
+  __reducerSchema("create_directory_place", CreateDirectoryPlaceReducer),
   __reducerSchema("say_hello", SayHelloReducer),
 );
 

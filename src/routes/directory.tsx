@@ -5,7 +5,6 @@ import { useSpacetimeDB, useSpacetimeDBQuery } from "spacetimedb/tanstack";
 import { tables } from "@/module_bindings";
 import { useSetRightSidebar } from "@/context/right-sidebar-context";
 import { CategoryCreateSideContent } from "@/components/pages/directory/CategoryCreateSideContent";
-import { SAMPLE_PLACES, SAMPLE_WEBSITES } from "@/data/directory";
 import { FilterLeftBar } from "@/components/pages/directory/FilterLeftBar";
 import { PersonCreateSideContent } from "@/components/pages/directory/PersonCreateSideContent";
 import { PlaceCreateSideContent } from "@/components/pages/directory/PlaceCreateSideContent";
@@ -40,6 +39,22 @@ type DirectoryPerson = {
   profileImageUrl?: string | null;
 };
 
+type DirectoryPlace = {
+  id: string;
+  name: string;
+  description?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+};
+
+type DirectoryWebsite = {
+  id: string;
+  name: string;
+  description?: string;
+  url?: string;
+};
+
 export const Route = createFileRoute("/directory")({
   component: RouteComponent,
 });
@@ -48,6 +63,8 @@ function RouteComponent() {
   const { setRightSidebarContent } = useSetRightSidebar();
   const { isActive } = useSpacetimeDB();
   const [peopleRows] = useSpacetimeDBQuery(tables.directoryPerson);
+  const [placeRows] = useSpacetimeDBQuery(tables.directoryPlace);
+  const [websiteRows] = useSpacetimeDBQuery(tables.directoryWebsite);
   const [imageUrlByStorageId, setImageUrlByStorageId] = useState<
     Record<string, string | null>
   >({});
@@ -154,6 +171,26 @@ function RouteComponent() {
     }
     return sorted;
   }, [people, peopleSearchQuery, peopleSortBy]);
+
+  const places = useMemo<DirectoryPlace[]>(() => {
+    return placeRows.map((row) => ({
+      id: row.id.toString(),
+      name: row.name,
+      description: row.description || undefined,
+      city: row.city || undefined,
+      state: row.state || undefined,
+      country: row.country || undefined,
+    }));
+  }, [placeRows]);
+
+  const websites = useMemo<DirectoryWebsite[]>(() => {
+    return websiteRows.map((row) => ({
+      id: row.id.toString(),
+      name: row.name,
+      description: row.description || undefined,
+      url: row.url || undefined,
+    }));
+  }, [websiteRows]);
 
   const isPlaces =
     !!selectedCategoryKey && selectedCategoryKey.startsWith("places");
@@ -351,51 +388,81 @@ function RouteComponent() {
         {isPlaces && (
           <section>
             <h2 className="mb-3 text-xl font-semibold">Places</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {SAMPLE_PLACES.map((place) => (
-                <Card key={place.id}>
-                  <CardContent className="p-5">
-                    <h3 className="font-semibold">{place.name}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {place.description}
-                    </p>
-                    <div className="mt-3 inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {place.city}, {place.country}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {places.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {places.map((place) => (
+                  <Card key={place.id}>
+                    <CardContent className="p-5">
+                      <h3 className="font-semibold">{place.name}</h3>
+                      {place.description && (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {place.description}
+                        </p>
+                      )}
+                      {(place.city || place.state || place.country) && (
+                        <div className="mt-3 inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {[place.city, place.state, place.country]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-6 text-sm text-muted-foreground">
+                  No place records yet. Add a place to get started.
+                </CardContent>
+              </Card>
+            )}
           </section>
         )}
 
         {isWebsites && (
           <section>
             <h2 className="mb-3 text-xl font-semibold">Websites</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {SAMPLE_WEBSITES.map((site) => (
-                <Card key={site.id}>
-                  <CardContent className="p-5">
-                    <div className="mb-2 flex items-start justify-between gap-3">
-                      <h3 className="font-semibold">{site.name}</h3>
-                      <Badge variant="outline">External</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {site.description}
-                    </p>
-                    <a
-                      href={site.url}
-                      className="mt-3 inline-flex text-sm text-primary hover:underline"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {site.url}
-                    </a>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {websites.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {websites.map((site) => (
+                  <Card key={site.id}>
+                    <CardContent className="p-5">
+                      <div className="mb-2 flex items-start justify-between gap-3">
+                        <h3 className="font-semibold">{site.name}</h3>
+                        <Badge variant="outline">External</Badge>
+                      </div>
+                      {site.description && (
+                        <p className="text-sm text-muted-foreground">
+                          {site.description}
+                        </p>
+                      )}
+                      {site.url && (
+                        <a
+                          href={
+                            site.url.startsWith("http")
+                              ? site.url
+                              : `https://${site.url}`
+                          }
+                          className="mt-3 inline-flex text-sm text-primary hover:underline"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {site.url}
+                        </a>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-6 text-sm text-muted-foreground">
+                  No website records yet. Add a website to get started.
+                </CardContent>
+              </Card>
+            )}
           </section>
         )}
       </main>
