@@ -35,6 +35,7 @@ const DIRECTORY_PAGE_SIZE = 12;
 
 type DirectoryPerson = {
   id: string;
+  createdAt: number;
   firstName: string;
   lastName: string;
   company?: string;
@@ -153,6 +154,7 @@ function RouteComponent() {
     return peopleRows.map((row) => {
       return {
         id: row.id.toString(),
+        createdAt: Number(row.created.microsSinceUnixEpoch),
         firstName: row.firstName,
         lastName: row.lastName,
         company: row.company || undefined,
@@ -233,6 +235,12 @@ function RouteComponent() {
             `${a.firstName} ${a.lastName}`,
           ),
         );
+        break;
+      case "created-desc":
+        sorted.sort((a, b) => b.createdAt - a.createdAt);
+        break;
+      case "created-asc":
+        sorted.sort((a, b) => a.createdAt - b.createdAt);
         break;
       case "name-asc":
       default:
@@ -370,6 +378,12 @@ function RouteComponent() {
                   <SelectContent>
                     <SelectItem value="name-asc">Name (A-Z)</SelectItem>
                     <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="created-desc">
+                      Created (newest)
+                    </SelectItem>
+                    <SelectItem value="created-asc">
+                      Created (oldest)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
