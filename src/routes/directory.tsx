@@ -21,7 +21,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { getStorageUrl } from "@/lib/convex-storage";
+
+const DIRECTORY_PAGE_SIZE = 12;
 
 type DirectoryPerson = {
   id: string;
@@ -59,6 +69,69 @@ export const Route = createFileRoute("/directory")({
   component: RouteComponent,
 });
 
+function DirectoryPagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) {
+    return null;
+  }
+
+  const goToPage =
+    (page: number) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      onPageChange(page);
+    };
+
+  return (
+    <Pagination className="mt-6">
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            href="#"
+            aria-disabled={currentPage === 1}
+            className={
+              currentPage === 1 ? "pointer-events-none opacity-50" : undefined
+            }
+            onClick={goToPage(currentPage - 1)}
+          />
+        </PaginationItem>
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+          (page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                href="#"
+                isActive={page === currentPage}
+                aria-label={`Go to page ${page}`}
+                onClick={goToPage(page)}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ),
+        )}
+        <PaginationItem>
+          <PaginationNext
+            href="#"
+            aria-disabled={currentPage === totalPages}
+            className={
+              currentPage === totalPages
+                ? "pointer-events-none opacity-50"
+                : undefined
+            }
+            onClick={goToPage(currentPage + 1)}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+
 function RouteComponent() {
   const { setRightSidebarContent } = useSetRightSidebar();
   const { isActive } = useSpacetimeDB();
@@ -74,6 +147,7 @@ function RouteComponent() {
   );
   const [peopleSearchQuery, setPeopleSearchQuery] = useState("");
   const [peopleSortBy, setPeopleSortBy] = useState("name-asc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const people = useMemo<DirectoryPerson[]>(() => {
     return peopleRows.map((row) => {
@@ -192,6 +266,32 @@ function RouteComponent() {
     }));
   }, [websiteRows]);
 
+  const peopleTotalPages = Math.ceil(
+    filteredPeople.length / DIRECTORY_PAGE_SIZE,
+  );
+  const placesTotalPages = Math.ceil(places.length / DIRECTORY_PAGE_SIZE);
+  const websitesTotalPages = Math.ceil(websites.length / DIRECTORY_PAGE_SIZE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategoryKey, peopleSearchQuery, peopleSortBy]);
+
+  const peoplePage = Math.min(currentPage, Math.max(peopleTotalPages, 1));
+  const placesPage = Math.min(currentPage, Math.max(placesTotalPages, 1));
+  const websitesPage = Math.min(currentPage, Math.max(websitesTotalPages, 1));
+  const paginatedPeople = filteredPeople.slice(
+    (peoplePage - 1) * DIRECTORY_PAGE_SIZE,
+    peoplePage * DIRECTORY_PAGE_SIZE,
+  );
+  const paginatedPlaces = places.slice(
+    (placesPage - 1) * DIRECTORY_PAGE_SIZE,
+    placesPage * DIRECTORY_PAGE_SIZE,
+  );
+  const paginatedWebsites = websites.slice(
+    (websitesPage - 1) * DIRECTORY_PAGE_SIZE,
+    websitesPage * DIRECTORY_PAGE_SIZE,
+  );
+
   const isPlaces =
     !!selectedCategoryKey && selectedCategoryKey.startsWith("places");
   const isPeople =
@@ -277,7 +377,7 @@ function RouteComponent() {
 
             {filteredPeople.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {filteredPeople.map((person) => (
+                {paginatedPeople.map((person) => (
                   <Card key={person.id} className="overflow-hidden">
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
@@ -382,6 +482,11 @@ function RouteComponent() {
                 </CardContent>
               </Card>
             )}
+            <DirectoryPagination
+              currentPage={peoplePage}
+              totalPages={peopleTotalPages}
+              onPageChange={setCurrentPage}
+            />
           </section>
         )}
 
@@ -390,7 +495,7 @@ function RouteComponent() {
             <h2 className="mb-3 text-xl font-semibold">Places</h2>
             {places.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {places.map((place) => (
+                {paginatedPlaces.map((place) => (
                   <Card key={place.id}>
                     <CardContent className="p-5">
                       <h3 className="font-semibold">{place.name}</h3>
@@ -418,6 +523,11 @@ function RouteComponent() {
                 </CardContent>
               </Card>
             )}
+            <DirectoryPagination
+              currentPage={placesPage}
+              totalPages={placesTotalPages}
+              onPageChange={setCurrentPage}
+            />
           </section>
         )}
 
@@ -426,7 +536,7 @@ function RouteComponent() {
             <h2 className="mb-3 text-xl font-semibold">Websites</h2>
             {websites.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {websites.map((site) => (
+                {paginatedWebsites.map((site) => (
                   <Card key={site.id}>
                     <CardContent className="p-5">
                       <div className="mb-2 flex items-start justify-between gap-3">
@@ -463,6 +573,11 @@ function RouteComponent() {
                 </CardContent>
               </Card>
             )}
+            <DirectoryPagination
+              currentPage={websitesPage}
+              totalPages={websitesTotalPages}
+              onPageChange={setCurrentPage}
+            />
           </section>
         )}
       </main>

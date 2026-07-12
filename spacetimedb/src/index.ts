@@ -173,6 +173,16 @@ export const createDirectoryPerson = spacetimedb.reducer(
   },
 );
 
+export const deleteDirectoryPerson = spacetimedb.reducer(
+  { id: t.u64() },
+  (ctx, { id }) => {
+    const person = ctx.db.directoryPerson.id.find(id);
+    if (person) {
+      ctx.db.directoryPerson.id.delete(id);
+    }
+  },
+);
+
 export const createDirectoryPlace = spacetimedb.reducer(
   {
     name: t.string(),
