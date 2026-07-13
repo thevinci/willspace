@@ -1,12 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Building2, Briefcase, Globe, Mail, MapPin, Phone } from "lucide-react";
-import { useSpacetimeDB, useSpacetimeDBQuery } from "spacetimedb/tanstack";
-import { tables } from "@/module_bindings";
+import {
+  Building2,
+  Briefcase,
+  EllipsisVertical,
+  Globe,
+  Info,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useReducer, useSpacetimeDBQuery } from "spacetimedb/tanstack";
+import { reducers, tables } from "@/module_bindings";
 import { useSetRightSidebar } from "@/context/right-sidebar-context";
 import { CategoryCreateSideContent } from "@/components/pages/directory/CategoryCreateSideContent";
 import { FilterLeftBar } from "@/components/pages/directory/FilterLeftBar";
 import { PersonCreateSideContent } from "@/components/pages/directory/PersonCreateSideContent";
+import { PersonDetailsSideContent } from "@/components/pages/directory/PersonDetailsSideContent";
 import { PlaceCreateSideContent } from "@/components/pages/directory/PlaceCreateSideContent";
 import { WebsiteCreateSideContent } from "@/components/pages/directory/WebsiteCreateSideContent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +42,22 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getStorageUrl } from "@/lib/convex-storage";
 
 const DIRECTORY_PAGE_SIZE = 12;
@@ -40,14 +69,19 @@ type DirectoryPerson = {
   lastName: string;
   company?: string;
   title?: string;
+  bio?: string;
+  categoryKey?: string;
+  categories?: string[];
   email?: string;
   phone?: string;
   city?: string;
   state?: string;
+  zip?: string;
   country?: string;
   website?: string;
   profileImage?: string;
   profileImageUrl?: string | null;
+  dataJson?: string;
 };
 
 type DirectoryPlace = {
@@ -135,7 +169,7 @@ function DirectoryPagination({
 
 function RouteComponent() {
   const { setRightSidebarContent } = useSetRightSidebar();
-  const { isActive } = useSpacetimeDB();
+  const deleteDirectoryPerson = useReducer(reducers.deleteDirectoryPerson);
   const [peopleRows] = useSpacetimeDBQuery(tables.directoryPerson);
   const [placeRows] = useSpacetimeDBQuery(tables.directoryPlace);
   const [websiteRows] = useSpacetimeDBQuery(tables.directoryWebsite);
@@ -147,8 +181,11 @@ function RouteComponent() {
     "people",
   );
   const [peopleSearchQuery, setPeopleSearchQuery] = useState("");
-  const [peopleSortBy, setPeopleSortBy] = useState("name-asc");
+  const [peopleSortBy, setPeopleSortBy] = useState("created-desc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [personToDelete, setPersonToDelete] = useState<DirectoryPerson | null>(
+    null,
+  );
 
   const people = useMemo<DirectoryPerson[]>(() => {
     return peopleRows.map((row) => {
@@ -159,62 +196,23 @@ function RouteComponent() {
         lastName: row.lastName,
         company: row.company || undefined,
         title: row.title || undefined,
+        bio: row.bio || undefined,
+        categoryKey: row.categoryKey || undefined,
+        categories: row.categories,
         email: row.email || undefined,
         phone: row.phone || undefined,
         city: row.city || undefined,
         state: row.state || undefined,
+        zip: row.zip || undefined,
         country: row.country || undefined,
         website: row.website || undefined,
         profileImage: row.profileImage || undefined,
         profileImageUrl: row.profileImage
           ? imageUrlByStorageId[row.profileImage]
           : null,
+        dataJson: row.dataJson || undefined,
       };
     });
-  }, [peopleRows, imageUrlByStorageId]);
-
-  useEffect(() => {
-    const storageIds = Array.from(
-      new Set(
-        peopleRows
-          .map((row) => row.profileImage?.trim())
-          .filter((value): value is string => !!value),
-      ),
-    ).filter((storageId) => !(storageId in imageUrlByStorageId));
-
-    if (storageIds.length === 0) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadUrls = async () => {
-      const entries = await Promise.all(
-        storageIds.map(async (storageId) => {
-          try {
-            const url = await getStorageUrl(storageId);
-            return [storageId, url] as const;
-          } catch {
-            return [storageId, null] as const;
-          }
-        }),
-      );
-
-      if (cancelled) {
-        return;
-      }
-
-      setImageUrlByStorageId((prev) => ({
-        ...prev,
-        ...Object.fromEntries(entries),
-      }));
-    };
-
-    void loadUrls();
-
-    return () => {
-      cancelled = true;
-    };
   }, [peopleRows, imageUrlByStorageId]);
 
   const filteredPeople = useMemo(() => {
@@ -280,6 +278,52 @@ function RouteComponent() {
   const placesTotalPages = Math.ceil(places.length / DIRECTORY_PAGE_SIZE);
   const websitesTotalPages = Math.ceil(websites.length / DIRECTORY_PAGE_SIZE);
 
+  // Load profile image URLs
+  useEffect(() => {
+    const storageIds = Array.from(
+      new Set(
+        peopleRows
+          .map((row) => row.profileImage?.trim())
+          .filter((value): value is string => !!value),
+      ),
+    ).filter((storageId) => !(storageId in imageUrlByStorageId));
+
+    if (storageIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadUrls = async () => {
+      const entries = await Promise.all(
+        storageIds.map(async (storageId) => {
+          try {
+            const url = await getStorageUrl(storageId);
+            return [storageId, url] as const;
+          } catch {
+            return [storageId, null] as const;
+          }
+        }),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      setImageUrlByStorageId((prev) => ({
+        ...prev,
+        ...Object.fromEntries(entries),
+      }));
+    };
+
+    void loadUrls();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [peopleRows, imageUrlByStorageId]);
+
+  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategoryKey, peopleSearchQuery, peopleSortBy]);
@@ -307,6 +351,22 @@ function RouteComponent() {
   const isWebsites =
     !!selectedCategoryKey && selectedCategoryKey.startsWith("websites");
 
+  const handleDeletePerson = async () => {
+    if (!personToDelete) {
+      return;
+    }
+
+    try {
+      await deleteDirectoryPerson({ id: BigInt(personToDelete.id) });
+      toast.success("Person deleted");
+      setPersonToDelete(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete person",
+      );
+    }
+  };
+
   return (
     <div className="flex flex-1 min-h-0">
       <FilterLeftBar
@@ -321,11 +381,6 @@ function RouteComponent() {
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Directory</h1>
-            <p className="text-sm text-muted-foreground">
-              {isActive
-                ? "Connected to SpacetimeDB"
-                : "Disconnected from SpacetimeDB"}
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -369,7 +424,7 @@ function RouteComponent() {
                 <Select
                   value={peopleSortBy}
                   onValueChange={(value) =>
-                    setPeopleSortBy(value ?? "name-asc")
+                    setPeopleSortBy(value ?? "created-desc")
                   }
                 >
                   <SelectTrigger className="w-[160px]">
@@ -427,6 +482,54 @@ function RouteComponent() {
                             </div>
                           )}
                         </div>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="-mr-2 -mt-2 shrink-0"
+                                aria-label={`More options for ${person.firstName} ${person.lastName}`}
+                              >
+                                <EllipsisVertical className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setRightSidebarContent(
+                                  <PersonDetailsSideContent
+                                    firstName={person.firstName}
+                                    lastName={person.lastName}
+                                    dataJson={person.dataJson}
+                                  />,
+                                )
+                              }
+                            >
+                              <Info />
+                              More details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setRightSidebarContent(
+                                  <PersonCreateSideContent person={person} />,
+                                )
+                              }
+                            >
+                              <Pencil />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setPersonToDelete(person)}
+                            >
+                              <Trash2 />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
 
                       <div className="mt-4 space-y-2 text-sm text-muted-foreground">
@@ -501,6 +604,29 @@ function RouteComponent() {
               totalPages={peopleTotalPages}
               onPageChange={setCurrentPage}
             />
+            <AlertDialog
+              open={!!personToDelete}
+              onOpenChange={(open) => !open && setPersonToDelete(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete person?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently remove {personToDelete?.firstName}{" "}
+                    {personToDelete?.lastName} from the directory.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={handleDeletePerson}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </section>
         )}
 

@@ -183,6 +183,55 @@ export const deleteDirectoryPerson = spacetimedb.reducer(
   },
 );
 
+export const updateDirectoryPerson = spacetimedb.reducer(
+  {
+    id: t.u64(),
+    firstName: t.string(),
+    lastName: t.string(),
+    company: t.string(),
+    title: t.string(),
+    bio: t.string(),
+    categoryKey: t.string(),
+    categories: t.array(t.string()),
+    email: t.string().optional(),
+    phone: t.string().optional(),
+    city: t.string(),
+    state: t.string(),
+    zip: t.string(),
+    country: t.string(),
+    website: t.string(),
+    profileImage: t.string(),
+    dataJson: t.string(),
+  },
+  (ctx, args) => {
+    const person = ctx.db.directoryPerson.id.find(args.id);
+    if (!person) {
+      throw new Error("Person not found");
+    }
+
+    ctx.db.directoryPerson.id.update({
+      ...person,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      company: args.company,
+      title: args.title,
+      bio: args.bio,
+      categoryKey: args.categoryKey,
+      categories: args.categories,
+      email: args.email,
+      phone: args.phone,
+      city: args.city,
+      state: args.state,
+      zip: args.zip,
+      country: args.country,
+      website: args.website,
+      profileImage: args.profileImage,
+      dataJson: args.dataJson,
+      updated: Timestamp.now(),
+    });
+  },
+);
+
 export const createDirectoryPlace = spacetimedb.reducer(
   {
     name: t.string(),

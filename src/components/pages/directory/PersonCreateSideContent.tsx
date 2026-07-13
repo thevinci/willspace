@@ -28,28 +28,53 @@ import {
   uploadFileToConvexStorage,
 } from "@/lib/convex-storage";
 
-export function PersonCreateSideContent() {
+export type PersonFormPerson = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  company?: string;
+  title?: string;
+  bio?: string;
+  categoryKey?: string;
+  categories?: string[];
+  email?: string;
+  phone?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  website?: string;
+  profileImage?: string;
+  dataJson?: string;
+};
+
+export function PersonCreateSideContent({
+  person,
+}: {
+  person?: PersonFormPerson;
+}) {
   const { setRightSidebarContent } = useSetRightSidebar();
   const { isActive } = useSpacetimeDB();
   const createDirectoryPerson = useReducer(reducers.createDirectoryPerson);
+  const updateDirectoryPerson = useReducer(reducers.updateDirectoryPerson);
 
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const [mainCategory, setMainCategory] = useState("");
+  const [mainCategory, setMainCategory] = useState(person?.categoryKey ?? "");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [company, setCompany] = useState("");
-  const [title, setTitle] = useState("");
-  const [bio, setBio] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
-  const [country, setCountry] = useState("");
-  const [website, setWebsite] = useState("");
+  const [firstName, setFirstName] = useState(person?.firstName ?? "");
+  const [lastName, setLastName] = useState(person?.lastName ?? "");
+  const [company, setCompany] = useState(person?.company ?? "");
+  const [title, setTitle] = useState(person?.title ?? "");
+  const [bio, setBio] = useState(person?.bio ?? "");
+  const [email, setEmail] = useState(person?.email ?? "");
+  const [phone, setPhone] = useState(person?.phone ?? "");
+  const [city, setCity] = useState(person?.city ?? "");
+  const [state, setState] = useState(person?.state ?? "");
+  const [zip, setZip] = useState(person?.zip ?? "");
+  const [country, setCountry] = useState(person?.country ?? "");
+  const [website, setWebsite] = useState(person?.website ?? "");
 
   const peopleCategories = DIRECTORY_CATEGORIES.filter((category) =>
     category.key.startsWith("people/"),
@@ -89,7 +114,7 @@ export function PersonCreateSideContent() {
     try {
       setIsSaving(true);
 
-      let profileImage = "";
+      let profileImage = person?.profileImage ?? "";
       if (selectedImage) {
         if (!isConvexStorageConfigured()) {
           toast.error(
@@ -100,18 +125,31 @@ export function PersonCreateSideContent() {
         profileImage = await uploadFileToConvexStorage(selectedImage);
       }
 
-      await createDirectoryPerson({
+      const personPayload = {
         ...payload,
         categories: payload.categoryKey ? [payload.categoryKey] : [],
         profileImage,
-        dataJson: "{}",
-      });
+        dataJson: person?.dataJson ?? "{}",
+      };
 
-      toast.success("Person created");
+      if (person) {
+        await updateDirectoryPerson({
+          id: BigInt(person.id),
+          ...personPayload,
+        });
+      } else {
+        await createDirectoryPerson(personPayload);
+      }
+
+      toast.success(person ? "Person updated" : "Person created");
       close();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to create person";
+        error instanceof Error
+          ? error.message
+          : person
+            ? "Failed to update person"
+            : "Failed to create person";
       toast.error(message);
     } finally {
       setIsSaving(false);
@@ -121,7 +159,9 @@ export function PersonCreateSideContent() {
   return (
     <div className="p-5">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Create person</h2>
+        <h2 className="text-lg font-semibold">
+          {person ? "Edit person" : "Create person"}
+        </h2>
         <Button variant="ghost" size="icon" onClick={close}>
           <X className="h-4 w-4" />
         </Button>
