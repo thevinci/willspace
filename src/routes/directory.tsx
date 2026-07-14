@@ -501,6 +501,7 @@ function RouteComponent() {
                               onClick={() =>
                                 setRightSidebarContent(
                                   <PersonDetailsSideContent
+                                    person={person}
                                     firstName={person.firstName}
                                     lastName={person.lastName}
                                     dataJson={person.dataJson}
