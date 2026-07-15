@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { LogIn, LogOut, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useAuth } from "react-oidc-context";
 
 type ThemeOption = "light" | "dark" | "system";
 
@@ -25,6 +28,17 @@ function ThemeIcon({ theme }: { theme?: string }) {
 
 export function Header() {
   const { theme = "system", setTheme } = useTheme();
+  const auth = useAuth();
+
+  const displayName =
+    auth.user?.profile.name ?? auth.user?.profile.email ?? "The Vinci";
+
+  const signOut = () => {
+    localStorage.removeItem(
+      `${import.meta.env.VITE_SPACETIMEDB_HOST ?? "ws://localhost:3000"}/${import.meta.env.VITE_SPACETIMEDB_DB_NAME ?? "tanstack-ts"}/auth_token`,
+    );
+    auth.signoutRedirect();
+  };
 
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
@@ -70,10 +84,50 @@ export function Header() {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <span className="text-sm text-muted-foreground">The Vinci</span>
-        <Avatar size="sm">
-          <AvatarFallback>TV</AvatarFallback>
-        </Avatar>
+        {auth.isLoading ? (
+          <span className="text-sm text-muted-foreground">
+            Checking account...
+          </span>
+        ) : auth.isAuthenticated ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="Open account menu"
+                />
+              }
+            >
+              <Avatar size="sm">
+                <AvatarFallback>
+                  {auth.user?.profile.name?.slice(0, 2).toUpperCase() ?? "TV"}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="truncate px-2 py-1.5 text-sm text-muted-foreground">
+                {displayName}
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOut}>
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!import.meta.env.VITE_SPACETIMEAUTH_CLIENT_ID}
+            onClick={() => auth.signinRedirect()}
+          >
+            <LogIn className="mr-2 h-4 w-4" />
+            Sign in
+          </Button>
+        )}
       </div>
     </header>
   );

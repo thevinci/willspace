@@ -19,15 +19,27 @@ This will start the local SpacetimeDB server, publish your module, generate Type
 spacetime dev --template tanstack-ts
 ```
 
-
-
 ## Open your app
 
 Navigate to [http://localhost:5173](http://localhost:5173) to see your app running.
 
 The template includes a TanStack Start app with TanStack Query integration with SpacetimeDB.
 
+## SpacetimeAuth
 
+SpacetimeAuth is wired through `react-oidc-context`. To enable the sign-in control,
+create a client in the SpacetimeAuth dashboard and add its public client ID to your
+local environment:
+
+```bash
+VITE_SPACETIMEAUTH_CLIENT_ID=your-client-id
+```
+
+Configure `http://localhost:5173/callback` as the client's redirect URI and
+`http://localhost:5173` as its post-logout redirect URI. For a deployed app, add the
+corresponding production URLs as well. The authority is
+`https://auth.spacetimedb.com/oidc` and the app sends the resulting OIDC identity
+token to SpacetimeDB.
 
 ## Explore the project structure
 
@@ -49,8 +61,6 @@ my-spacetime-app/
 └── package.json
 ```
 
-
-
 ## Understand tables and reducers
 
 Open `spacetimedb/src/index.ts` to see the module code. The template includes a `person` table and two reducers: `add` to insert a person, and `sayHello` to greet everyone.
@@ -58,14 +68,14 @@ Open `spacetimedb/src/index.ts` to see the module code. The template includes a 
 Tables store your data. Reducers are functions that modify data — they're the only way to write to the database.
 
 ```typescript
-import { schema, table, t } from 'spacetimedb/server';
+import { schema, table, t } from "spacetimedb/server";
 
 const spacetimedb = schema({
   person: table(
     { public: true },
     {
       name: t.string(),
-    }
+    },
   ),
 });
 export default spacetimedb;
@@ -74,18 +84,16 @@ export const add = spacetimedb.reducer(
   { name: t.string() },
   (ctx, { name }) => {
     ctx.db.person.insert({ name });
-  }
+  },
 );
 
-export const sayHello = spacetimedb.reducer(ctx => {
+export const sayHello = spacetimedb.reducer((ctx) => {
   for (const person of ctx.db.person.iter()) {
     console.info(`Hello, ${person.name}!`);
   }
-  console.info('Hello, World!');
+  console.info("Hello, World!");
 });
 ```
-
-
 
 ## Test with the CLI
 
@@ -112,8 +120,6 @@ spacetime logs
 2025-01-13T12:00:00.000000Z  INFO: Hello, World!
 ```
 
-
-
 ## Query and update data
 
 Use `useSpacetimeDBQuery()` to subscribe to tables with TanStack Query — it returns `[data, loading, query]`. SpacetimeDB React hooks also work with TanStack Start.
@@ -136,7 +142,7 @@ function App() {
     </ul>
   );
 }
-````
+```
 
 ## Next steps
 

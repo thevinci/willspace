@@ -81,7 +81,9 @@ export function PersonDetailsSideContent({
       toast.success("Person details saved");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save person details",
+        error instanceof Error
+          ? error.message
+          : "Failed to save person details",
       );
     } finally {
       setIsSaving(false);
