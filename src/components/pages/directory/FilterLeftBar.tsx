@@ -21,9 +21,7 @@ export function FilterLeftBar({
   onCreateCategory: () => void;
 }) {
   const [categoryRows] = useSpacetimeDBQuery(tables.directoryCategory);
-  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(
-    new Set(["people", "places", "websites"]),
-  );
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
 
   const categories = useMemo<DirectoryCategory[]>(() => {
     return categoryRows

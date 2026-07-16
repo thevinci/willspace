@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ChatSideContent } from "@/components/shared/ChatSideContent";
+import { useSetRightSidebar } from "@/context/right-sidebar-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogIn, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { Bot, LogIn, LogOut, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "react-oidc-context";
 
@@ -29,6 +31,7 @@ function ThemeIcon({ theme }: { theme?: string }) {
 export function Header() {
   const { theme = "system", setTheme } = useTheme();
   const auth = useAuth();
+  const { setRightSidebarContent } = useSetRightSidebar();
 
   const displayName =
     auth.user?.profile.name ?? auth.user?.profile.email ?? "The Vinci";
@@ -84,6 +87,14 @@ export function Header() {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Open assistant chat"
+          onClick={() => setRightSidebarContent(<ChatSideContent />)}
+        >
+          <Bot className="h-4 w-4" />
+        </Button>
         {auth.isLoading ? (
           <span className="text-sm text-muted-foreground">
             Checking account...

@@ -3,7 +3,7 @@ import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 export function RightSidebar({
   content,
   ...props
-}: React.ComponentProps<typeof Sidebar> & {
+}: Omit<React.ComponentProps<typeof Sidebar>, "content"> & {
   content: React.ReactNode | null;
 }) {
   const isOpen = !!content;

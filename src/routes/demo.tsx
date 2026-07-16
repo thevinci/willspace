@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Card,
   CardHeader,
@@ -7,51 +7,30 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-  CardAction,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuGroup,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import {
   Sparkles,
   Activity,
   Users,
   CreditCard,
   ArrowUpRight,
-  Search,
   Bell,
   Shield,
-  Moon,
-  Sun,
-  Laptop,
-  Command,
   Mail,
   Lock,
   CheckCircle2,
   TrendingUp,
-  LayoutDashboard,
-  Settings,
-  HelpCircle,
-  LogOut,
-  ChevronDown,
-} from 'lucide-react';
+} from "lucide-react";
 
-export const Route = createFileRoute('/demo')({
+export const Route = createFileRoute("/demo")({
   component: Demo,
 });
 
 // Custom Github SVG Icon
-const GithubIcon = (props: React.ComponentProps<'svg'>) => (
+const GithubIcon = (props: React.ComponentProps<"svg">) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
     <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.193 22 16.44 22 12.017 22 6.484 17.522 2 12 2z" />
   </svg>
@@ -60,10 +39,9 @@ const GithubIcon = (props: React.ComponentProps<'svg'>) => (
 function Demo() {
   const [notifications, setNotifications] = useState(true);
   const [securityEmails, setSecurityEmails] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [selectedProject, setSelectedProject] = useState('willshop2');
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,8 +52,8 @@ function Demo() {
 
   const handleSignOut = () => {
     setIsSignedIn(false);
-    setEmail('');
-    setPassword('');
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -94,14 +72,19 @@ function Demo() {
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            A premium playground demonstrating Shadcn components built on top of TanStack Start and Convex. Interact
-            with themes, forms, and analytical dashboards in real-time.
+            A premium playground demonstrating Shadcn components built on top of
+            TanStack Start and Convex. Interact with themes, forms, and
+            analytical dashboards in real-time.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="h-10 px-6 font-semibold shadow-md">
               Get Started
             </Button>
-            <Button size="lg" variant="outline" className="h-10 px-6 font-semibold shadow-sm">
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-10 px-6 font-semibold shadow-sm"
+            >
               <GithubIcon className="mr-2 h-4 w-4" /> View Source
             </Button>
           </div>
@@ -116,7 +99,9 @@ function Demo() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Revenue
+              </CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -132,7 +117,9 @@ function Demo() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Subscriptions</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Subscriptions
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -148,7 +135,9 @@ function Demo() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Sales Volume</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Sales Volume
+              </CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -164,7 +153,9 @@ function Demo() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Now</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Active Now
+              </CardTitle>
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
             </CardHeader>
             <CardContent>
@@ -184,7 +175,9 @@ function Demo() {
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Sign In Account</CardTitle>
-                <CardDescription>Enter your email and password to access the app demo.</CardDescription>
+                <CardDescription>
+                  Enter your email and password to access the app demo.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {isSignedIn ? (
@@ -192,9 +185,17 @@ function Demo() {
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 mb-2">
                       <CheckCircle2 className="h-6 w-6" />
                     </div>
-                    <h3 className="font-semibold text-lg">Successfully Signed In</h3>
-                    <p className="text-sm text-muted-foreground break-all">{email || 'user@example.com'}</p>
-                    <Button variant="outline" className="w-full mt-4" onClick={handleSignOut}>
+                    <h3 className="font-semibold text-lg">
+                      Successfully Signed In
+                    </h3>
+                    <p className="text-sm text-muted-foreground break-all">
+                      {email || "user@example.com"}
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-4"
+                      onClick={handleSignOut}
+                    >
                       Sign Out
                     </Button>
                   </div>
@@ -228,7 +229,10 @@ function Demo() {
                         >
                           Password
                         </label>
-                        <a href="#" className="text-xs text-primary hover:underline">
+                        <a
+                          href="#"
+                          className="text-xs text-primary hover:underline"
+                        >
                           Forgot password?
                         </a>
                       </div>
@@ -265,7 +269,7 @@ function Demo() {
                     variant="outline"
                     className="h-9"
                     onClick={() => {
-                      setEmail('google.user@gmail.com');
+                      setEmail("google.user@gmail.com");
                       setIsSignedIn(true);
                     }}
                   >
@@ -275,7 +279,7 @@ function Demo() {
                     variant="outline"
                     className="h-9"
                     onClick={() => {
-                      setEmail('github.dev@github.com');
+                      setEmail("github.dev@github.com");
                       setIsSignedIn(true);
                     }}
                   >
@@ -293,7 +297,9 @@ function Demo() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Recent Sales</CardTitle>
-                  <CardDescription>You made 265 sales this month.</CardDescription>
+                  <CardDescription>
+                    You made 265 sales this month.
+                  </CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" className="h-8 gap-1">
                   View All <ArrowUpRight className="h-4 w-4" />
@@ -308,11 +314,17 @@ function Demo() {
                         OM
                       </div>
                       <div>
-                        <p className="text-sm font-medium leading-none">Olivia Martin</p>
-                        <p className="text-xs text-muted-foreground">olivia.martin@email.com</p>
+                        <p className="text-sm font-medium leading-none">
+                          Olivia Martin
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          olivia.martin@email.com
+                        </p>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-right text-emerald-500">+$1,999.00</div>
+                    <div className="text-sm font-semibold text-right text-emerald-500">
+                      +$1,999.00
+                    </div>
                   </div>
 
                   {/* Sales Item 2 */}
@@ -322,11 +334,17 @@ function Demo() {
                         JL
                       </div>
                       <div>
-                        <p className="text-sm font-medium leading-none">Jackson Lee</p>
-                        <p className="text-xs text-muted-foreground">jackson.lee@email.com</p>
+                        <p className="text-sm font-medium leading-none">
+                          Jackson Lee
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          jackson.lee@email.com
+                        </p>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-right text-emerald-500">+$39.00</div>
+                    <div className="text-sm font-semibold text-right text-emerald-500">
+                      +$39.00
+                    </div>
                   </div>
 
                   {/* Sales Item 3 */}
@@ -336,11 +354,17 @@ function Demo() {
                         IN
                       </div>
                       <div>
-                        <p className="text-sm font-medium leading-none">Isabella Nguyen</p>
-                        <p className="text-xs text-muted-foreground">isabella.nguyen@email.com</p>
+                        <p className="text-sm font-medium leading-none">
+                          Isabella Nguyen
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          isabella.nguyen@email.com
+                        </p>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-right text-emerald-500">+$299.00</div>
+                    <div className="text-sm font-semibold text-right text-emerald-500">
+                      +$299.00
+                    </div>
                   </div>
 
                   {/* Sales Item 4 */}
@@ -350,11 +374,17 @@ function Demo() {
                         WK
                       </div>
                       <div>
-                        <p className="text-sm font-medium leading-none">William Kim</p>
-                        <p className="text-xs text-muted-foreground">will@email.com</p>
+                        <p className="text-sm font-medium leading-none">
+                          William Kim
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          will@email.com
+                        </p>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-right text-emerald-500">+$99.00</div>
+                    <div className="text-sm font-semibold text-right text-emerald-500">
+                      +$99.00
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -364,18 +394,27 @@ function Demo() {
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>System Settings</CardTitle>
-                <CardDescription>Configure notifications and theme properties.</CardDescription>
+                <CardDescription>
+                  Configure notifications and theme properties.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between rounded-lg border border-border p-3">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-1.5">
                       <Bell className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-sm font-semibold">Push Notifications</p>
+                      <p className="text-sm font-semibold">
+                        Push Notifications
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">Receive real-time alerts on active sales.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Receive real-time alerts on active sales.
+                    </p>
                   </div>
-                  <Switch checked={notifications} onCheckedChange={setNotifications} />
+                  <Switch
+                    checked={notifications}
+                    onCheckedChange={setNotifications}
+                  />
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg border border-border p-3">
@@ -384,9 +423,14 @@ function Demo() {
                       <Shield className="h-4 w-4 text-muted-foreground" />
                       <p className="text-sm font-semibold">Security Alerts</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">Receive security audit log emails weekly.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Receive security audit log emails weekly.
+                    </p>
                   </div>
-                  <Switch checked={securityEmails} onCheckedChange={setSecurityEmails} />
+                  <Switch
+                    checked={securityEmails}
+                    onCheckedChange={setSecurityEmails}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
