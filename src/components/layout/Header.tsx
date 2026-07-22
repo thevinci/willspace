@@ -46,13 +46,17 @@ export function Header() {
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
       <div className="flex items-center gap-8">
-        <h1 className="text-base font-semibold tracking-tight">willspace</h1>
+        <Link to="/">
+          <h1 className="text-base font-semibold tracking-tight">willspace</h1>
+        </Link>
 
         <nav className="flex items-center gap-4 text-sm">
           <Link className="hover:underline" to="/demo">
             Demo
           </Link>
-          <span className="text-muted-foreground">Apps</span>
+          <Link className="hover:underline" to="/apps">
+            Apps
+          </Link>
           <span className="text-muted-foreground">Market</span>
           <Link className="hover:underline" to="/directory">
             Directory

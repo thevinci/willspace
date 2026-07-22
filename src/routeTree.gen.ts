@@ -13,6 +13,9 @@ import { Route as SpaceRouteImport } from './routes/space'
 import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppsIndexRouteImport } from './routes/apps/index'
+import { Route as AppsNotesRouteImport } from './routes/apps/notes'
+import { Route as Apps3dEngineRouteImport } from './routes/apps/3d-engine'
 
 const SpaceRoute = SpaceRouteImport.update({
   id: '/space',
@@ -34,18 +37,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppsIndexRoute = AppsIndexRouteImport.update({
+  id: '/apps/',
+  path: '/apps/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsNotesRoute = AppsNotesRouteImport.update({
+  id: '/apps/notes',
+  path: '/apps/notes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Apps3dEngineRoute = Apps3dEngineRouteImport.update({
+  id: '/apps/3d-engine',
+  path: '/apps/3d-engine',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
   '/directory': typeof DirectoryRoute
   '/space': typeof SpaceRoute
+  '/apps/3d-engine': typeof Apps3dEngineRoute
+  '/apps/notes': typeof AppsNotesRoute
+  '/apps/': typeof AppsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
   '/directory': typeof DirectoryRoute
   '/space': typeof SpaceRoute
+  '/apps/3d-engine': typeof Apps3dEngineRoute
+  '/apps/notes': typeof AppsNotesRoute
+  '/apps': typeof AppsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +77,38 @@ export interface FileRoutesById {
   '/demo': typeof DemoRoute
   '/directory': typeof DirectoryRoute
   '/space': typeof SpaceRoute
+  '/apps/3d-engine': typeof Apps3dEngineRoute
+  '/apps/notes': typeof AppsNotesRoute
+  '/apps/': typeof AppsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo' | '/directory' | '/space'
+  fullPaths:
+    | '/'
+    | '/demo'
+    | '/directory'
+    | '/space'
+    | '/apps/3d-engine'
+    | '/apps/notes'
+    | '/apps/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo' | '/directory' | '/space'
-  id: '__root__' | '/' | '/demo' | '/directory' | '/space'
+  to:
+    | '/'
+    | '/demo'
+    | '/directory'
+    | '/space'
+    | '/apps/3d-engine'
+    | '/apps/notes'
+    | '/apps'
+  id:
+    | '__root__'
+    | '/'
+    | '/demo'
+    | '/directory'
+    | '/space'
+    | '/apps/3d-engine'
+    | '/apps/notes'
+    | '/apps/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +116,9 @@ export interface RootRouteChildren {
   DemoRoute: typeof DemoRoute
   DirectoryRoute: typeof DirectoryRoute
   SpaceRoute: typeof SpaceRoute
+  Apps3dEngineRoute: typeof Apps3dEngineRoute
+  AppsNotesRoute: typeof AppsNotesRoute
+  AppsIndexRoute: typeof AppsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +151,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apps/': {
+      id: '/apps/'
+      path: '/apps'
+      fullPath: '/apps/'
+      preLoaderRoute: typeof AppsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/notes': {
+      id: '/apps/notes'
+      path: '/apps/notes'
+      fullPath: '/apps/notes'
+      preLoaderRoute: typeof AppsNotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/3d-engine': {
+      id: '/apps/3d-engine'
+      path: '/apps/3d-engine'
+      fullPath: '/apps/3d-engine'
+      preLoaderRoute: typeof Apps3dEngineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +180,9 @@ const rootRouteChildren: RootRouteChildren = {
   DemoRoute: DemoRoute,
   DirectoryRoute: DirectoryRoute,
   SpaceRoute: SpaceRoute,
+  Apps3dEngineRoute: Apps3dEngineRoute,
+  AppsNotesRoute: AppsNotesRoute,
+  AppsIndexRoute: AppsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
